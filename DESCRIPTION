@@ -1,0 +1,12 @@
+Package: bigrace
+Type: Package
+Title: Some Useful Data
+Description:  No description provided.
+Version: 0.1.0
+Author: Homer White
+Maintainer: Homer White <homerhanumat@gmail.com>
+License: MIT + file LICENSE
+Encoding: UTF-8
+LazyLoad: yes
+LazyData: true
+RoxygenNote: 6.1.1

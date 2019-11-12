@@ -1,0 +1,99 @@
+---
+title: "Make Data Frames"
+author: "Homer White"
+output:
+  rmdformats::readthedown:
+    highlight: kate
+    toc_depth: 2
+---
+
+## Attach Packages
+
+```{r include = FALSE}
+library(tidyverse)
+library(lubridate)
+```
+
+## Import
+
+```{r}
+racers <- readr::read_csv("racers.csv")
+teams <- readr::read_csv("teams.csv")
+results <- readr::read_csv("results.csv")
+```
+
+The data table `racers` contains the following variables:
+
+* an ID for the runner, provided by the race organizer when the runner registered;
+* the name of the runner (last, first);
+* the runner's home address (note that some addresses have only four-digits for the zip-code);
+* the sex of the runner (M = male, F = female);
+* the runner's date of birth;
+* an ID for the runner's team (note that some runners are "independent"; their team ID is `NA`).
+
+The data table `teams` contains the following variables:
+
+* the ID for the team;
+* the name of the team.
+
+The data table `results` contains the following variables:
+
+* the ID for the runner;
+* the runner's time to complete the marathon.
+
+
+## Cleaning
+
+Your first task is to clean the `racers` data.  Use `racers` to create a new data table named `Racers`:
+
+```{r}
+Racers <- 
+  racers %>%
+  tidyr::extract(name, into = c("last_name", "first_name"),
+                 regex = "(\\w+), (\\w+)") %>%
+  mutate(dob = as_date(mdy(dob))) %>%
+  select(id, first_name, last_name, sex, dob, team)
+```
+
+
+Now clean the `results` table.  The primary goal here is to convert the given times, which are strings, into a form that permits them to be compared numerically.  You need to create a new data table called `Results` that consists of the variables in results along with a new variable `seconds` that gives the completion time in seconds.
+
+```{r}
+Results <-
+  results %>%
+  mutate(seconds = as.numeric(lubridate::hms(time)))
+```
+
+
+### Joining
+
+Join `Racers` with `Results` and with `teams` to get a new data table called `Marathon`.
+
+```{r}
+Marathon <-
+  Racers %>%
+  inner_join(Results, by = "id") %>%
+  left_join(teams, by = c("team" = "teamID"))
+```
+
+## Save
+
+Now save the data in the right place:
+
+```{r}
+save(Racers, file = "../data/Racers.rda")
+save(Results, file = "../data/Results.rda")
+save(teams, file = "../data/teams.rda")
+save(Marathon, file = "../data/Marathon.rda")
+```
+
+
+
+
+
+
+
+
+
+
+
